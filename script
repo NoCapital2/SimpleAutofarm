@@ -208,7 +208,7 @@ function FindMap()
 end
 
 RoundStarted = false
-LocalPlayerDead = false
+LocalPlayerDead = true
 AutofarmEnabled = false
 function AutoFarmButton(btn)
 	if not AutofarmEnabled then
@@ -219,6 +219,7 @@ function AutoFarmButton(btn)
 			if name == Player.Name then
 				LocalPlayerDead = plrdata["Dead"]
 				RoundStarted = plrdata["Dead"]
+				print(plrdata["Dead"])
 			end
 		end
 	else
@@ -309,7 +310,7 @@ psobgrgr = nil
 --Autofarm main
 spawn(function()
 	while true do
-		if AutofarmEnabled and Player.Character and returncoincontaier() and not LocalPlayerDead and not FullBag then
+		if AutofarmEnabled and RoundStarted and Player.Character and returncoincontaier() and not LocalPlayerDead and not FullBag then
 			if psobgrgr == nil then psobgrgr = RunService.Heartbeat:Connect(PosPlayerCharacter) end
 			if FindNearestCoin(returncoincontaier())[1] ~= nil then
 				local dds = FindNearestCoin(returncoincontaier())
