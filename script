@@ -1,0 +1,341 @@
+if _G.SimpleAutoFarmLoaded then game.CoreGui.SimpleAutofarmUI.Enabled = true end
+_G.SimpleAutoFarmLoaded = true
+Player = game.Players.LocalPlayer
+Players = game.Players
+CoreGui = game.CoreGui
+ButtonEvent = Instance.new("BindableEvent")
+GuiLibrary = loadstring(game:HttpGet(""))()
+RunService = game:GetService("RunService")
+TweenService = game:GetService("TweenService")
+CoinCollectedEvent = game.ReplicatedStorage.Remotes.Gameplay.CoinCollected
+RoundStartEvent = game.ReplicatedStorage.Remotes.Gameplay.RoundStart
+RoundEndEvent = game.ReplicatedStorage.Remotes.Gameplay.RoundEndFade
+PlayerData = game.ReplicatedStorage.Remotes.Extras.GetPlayerData
+PlayerDataChanged = game.ReplicatedStorage.Remotes.Gameplay.PlayerDataChanged
+RandomNameFunction = GuiLibrary.RandomName
+MainGui = GuiLibrary.ScreenGUI({
+	Name = "SimpleAutofarmUI",
+	ResetOnSpawn = false,
+	Parent = CoreGui
+})
+MainScreenSize = MainGui.AbsoluteSize
+MainFrame = GuiLibrary.Frame({
+	Name = RandomNameFunction(),
+	AnchorPoint = Vector2.new(.5, .5),
+	BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392),
+	Position = UDim2.new(.5, 0, .5, 0),
+	Size = UDim2.new(400 / MainScreenSize.X, 0, 350 / MainScreenSize.Y, 0),
+	ZIndex = 2,
+	Parent = MainGui,
+	Draggable_ = true
+})
+MainFrameUiCorner = GuiLibrary.UICorner({
+	Name = RandomNameFunction(),
+	CornerRadius = UDim.new(0, 12),
+	Parent = MainFrame
+})
+MainFrameShadow = GuiLibrary.Frame({
+	Name = RandomNameFunction(),
+	AnchorPoint = Vector2.new(.5, .5),
+	BackgroundColor3 = Color3.new(0, 0, 0),
+	Position = UDim2.new(.5, 0, .5, 0),
+	Size = UDim2.new(400 / MainScreenSize.X, 0, 350 / MainScreenSize.Y, 0),
+	ZIndex = 1,
+	Parent = MainGui,
+	attach = {MainFrame, UDim2.new(0.005, 0, 0.01, 0)}
+})
+MainFrameShadowUiCorner = GuiLibrary.UICorner({
+	Name = RandomNameFunction(),
+	CornerRadius = UDim.new(0, 12),
+	Parent = MainFrameShadow
+})
+CloseMainFrameButton = GuiLibrary.TextButton({
+	Name = RandomNameFunction(),
+	BackgroundTransparency = 1,
+	Position = UDim2.new(0.875, 0, 0, 0),
+	Size = UDim2.new(50 / MainFrame.AbsoluteSize.X, 0, 50 / MainFrame.AbsoluteSize.Y, 0),
+	["Font"] = Enum.Font.FredokaOne,
+	Text = "X",
+	ZIndex = 2,
+	TextColor3 = Color3.new(1, 0, 0),
+	TextScaled = true,
+	TextStrokeTransparency = 0,
+	TextStrokeColor3 = Color3.new(0, 0.87451, 0.890196),
+	Parent = MainFrame
+})
+NameTextLabel = GuiLibrary.TextLabel({
+	Name = RandomNameFunction(),
+	BackgroundTransparency = 1,
+	Position = UDim2.new(0, 0, 0, 0),
+	Size = UDim2.new(350 / MainFrame.AbsoluteSize.X, 0, 50 / MainFrame.AbsoluteSize.Y, 0),
+	["Font"] = Enum.Font.FredokaOne,
+	Text = "Simple autofarm",
+	ZIndex = 2,
+	TextColor3 = Color3.new(1, 1, 1),
+	TextStrokeTransparency = 0,
+	TextStrokeColor3 = Color3.new(0, 0.87451, 0.890196),
+	TextScaled = true,
+	Parent = MainFrame
+})
+Container = GuiLibrary.Frame({
+	Name = RandomNameFunction(),
+	BackgroundTransparency = 1,
+	BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392),
+	Position = UDim2.new(0, 0, 0.143, 0),
+	Size = UDim2.new(400 / MainFrame.AbsoluteSize.X, 0, 300 / MainFrame.AbsoluteSize.Y, 0),
+	ZIndex = 2,
+	Parent = MainFrame,
+	Draggable_ = true
+})
+
+FunctionList = {"Autofarm", "Anti lag", "Reset when full bag"}
+for i, funcname in FunctionList do
+	local FrameC = GuiLibrary.Frame({
+		Name = RandomNameFunction(),
+		BackgroundColor3 = Color3.new(0.509804, 0.509804, 0.509804),
+		Position = UDim2.new(0, 0, 70 * (i-1) / 300, 0),
+		Size = UDim2.new(1, 0, 70 / 300, 0),
+		BorderMode = Enum.BorderMode.Inset,
+		BorderColor3 = Color3.new(1, 1, 1),
+		ZIndex = 2,
+		Parent = Container,
+		Draggable_ = true
+	})
+	local FuncLabel = GuiLibrary.TextLabel({
+		Name = RandomNameFunction(),
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0.01, 0, 0.05, 0),
+		Size = UDim2.new(200 / FrameC.AbsoluteSize.X, 0, 60 / FrameC.AbsoluteSize.Y, 0),
+		["Font"] = Enum.Font.FredokaOne,
+		Text = funcname,
+		ZIndex = 2,
+		TextColor3 = Color3.new(0, 0.87451, 0.890196),
+		TextStrokeTransparency = 0,
+		TextStrokeColor3 = Color3.new(0, 0, 0),
+		TextScaled = true,
+		Parent = FrameC
+	})
+	local UseButton = GuiLibrary.TextButton({
+		Name = RandomNameFunction(),
+		Position = UDim2.new(0.687, 0, 0.141, 0),
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		Size = UDim2.new(115 / FrameC.AbsoluteSize.X, 0, 50 / FrameC.AbsoluteSize.Y, 0),
+		["Font"] = Enum.Font.FredokaOne,
+		Text = "Enable",
+		ZIndex = 2,
+		TextColor3 = Color3.new(1, 0, 0),
+		TextScaled = true,
+		TextStrokeTransparency = 0,
+		TextStrokeColor3 = Color3.new(0, 0, 0),
+		Parent = FrameC
+	})
+	local UiCorner1 = GuiLibrary.UICorner({
+		Name = RandomNameFunction(),
+		CornerRadius = UDim.new(0, 12),
+		Parent = UseButton
+	})
+	UseButton.MouseButton1Click:Connect(function()
+		ButtonEvent:Fire(funcname, UseButton)
+	end)
+end
+
+function AntiAFK()
+	local GC = getconnections or get_signal_cons
+	if GC then
+		for i,v in pairs(GC(Player.Idled)) do
+			if v["Disable"] then
+				v["Disable"](v)
+			elseif v["Disconnect"] then
+				v["Disconnect"](v)
+			end
+		end
+	else
+		local VirtualUser = cloneref(game:GetService("VirtualUser"))
+		Players.LocalPlayer.Idled:Connect(function()
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton2(Vector2.new())
+		end)
+	end
+end
+
+--AntiAFK()
+
+resonfulbag = false
+function ResetOnFullBag(btn)
+	if not resonfulbag then
+		resonfulbag = true
+		btn.TextColor3 = Color3.new(0, 1, 0)
+		btn.Text = "Disable"
+	else
+		resonfulbag = false
+		btn.TextColor3 = Color3.new(1, 0, 0)
+		btn.Text = "Enable"
+	end
+end
+
+antilagerg = false
+function AntiLagFun(btn)
+	if not antilagerg then
+		antilagerg = true
+		btn.TextColor3 = Color3.new(0, 1, 0)
+		btn.Text = "Disable"
+		settings().Rendering.QualityLevel = 1
+		Player.PlayerGui.MainGUI.Enabled = false
+		Player.PlayerGui.MainGUI.ResetOnSpawn = false
+		for _, v1 in pairs(Player.PlayerScripts:GetChildren()) do
+			if v1.Name ~= "TextChatServiceClient" and v1.Name ~= "Pets" and v1.Name ~= "PetsNew" then
+				v1.Enabled = false
+			end
+		end
+	else
+		antilagerg = false
+		btn.TextColor3 = Color3.new(1, 0, 0)
+		btn.Text = "Enable"
+		Player.PlayerGui.MainGUI.Enabled = true
+		Player.PlayerGui.MainGUI.ResetOnSpawn = true
+		for _, v1 in pairs(Player.PlayerScripts:GetChildren()) do
+			if v1.Name ~= "TextChatServiceClient" and v1.Name ~= "Pets" and v1.Name ~= "PetsNew" then
+				v1.Enabled = true
+			end
+		end
+	end
+end
+
+function FindMap()
+	for _, v in pairs(workspace:GetChildren()) do
+		if v:FindFirstChild("Raggy") then
+			return v
+		end
+	end
+	return false
+end
+
+RoundStarted = false
+LocalPlayerDead = false
+AutofarmEnabled = false
+function AutoFarmButton(btn)
+	if not AutofarmEnabled then
+		AutofarmEnabled = true
+		btn.TextColor3 = Color3.new(0, 1, 0)
+		btn.Text = "Disable"
+	else
+		AutofarmEnabled = false
+		btn.TextColor3 = Color3.new(1, 0, 0)
+		btn.Text = "Enable"
+		workspace.Gravity = 196.2
+		PcallTP(FindMap()["Spawns"][math.random(1, table.maxn(FindMap()["Spawns"]:GetChildren()))].CFrame * CFrame.new(0, 3, 0))
+	end
+end
+
+function returncoincontaier()
+	for _, v in workspace:GetChildren() do
+		if v:FindFirstChild("CoinContainer") and v:IsA("Model") then
+			return v:FindFirstChild("CoinContainer")
+		end
+	end
+	return false
+end
+
+function FindNearestCoin(container)
+	local coin = nil
+	local magn = math.huge
+	for _, v in pairs(container:GetChildren()) do
+		if v:GetAttribute("CoinID") == "Coin" and v:FindFirstChild("TouchInterest") then
+			if Player.Character then
+				if Player.Character:FindFirstChild("HumanoidRootPart") then
+					if math.abs((Player.Character.HumanoidRootPart.Position - v.Position).Magnitude) < magn then
+						coin = v
+						magn = math.abs((Player.Character.HumanoidRootPart.Position - v.Position).Magnitude)
+					end
+				end
+			end
+		end
+	end
+	local gg = {coin, magn}
+	return gg
+end
+
+FullBag = false
+CoinCollectedEvent.OnClientEvent:Connect(function(cointype, current, max)
+	if cointype == "Coin" and tonumber(current) == tonumber(max) then
+		FullBag = true
+		if resonfulbag then
+			Player.Character:FindFirstChildOfClass("Humanoid").Health = 0
+		end
+	end
+end)
+
+RoundStartEvent.OnClientEvent:Connect(function()
+	RoundStarted = true
+	FullBag = false
+end)
+
+RoundEndEvent.OnClientEvent:Connect(function()
+	RoundStarted = false
+	FullBag = false
+end)
+
+PlayerDataChanged.OnClientEvent:Connect(function(data)
+	for name, plrdata in data do
+		if name == Player.Name then
+			LocalPlayerDead = plrdata["Dead"]
+		end
+	end
+end)
+
+function PcallTP(Position)
+	if Player.Character then
+		if Player.Character:FindFirstChild("HumanoidRootPart") then
+			Player.Character.HumanoidRootPart.CFrame = Position
+		end
+	end
+end
+
+function PosPlayerCharacter()
+	if Player.Character then
+		if Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character:FindFirstChildOfClass("Humanoid") then
+			workspace.Gravity = 0
+			Player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = true
+			Player.Character.HumanoidRootPart.CFrame = CFrame.new(Player.Character.HumanoidRootPart.Position.X, Player.Character.HumanoidRootPart.Position.Y, Player.Character.HumanoidRootPart.Position.Z) * CFrame.Angles(math.rad(90), 0, 0)
+		end
+	end
+end
+
+--Autofarm main
+spawn(function()
+	while true do
+		if AutofarmEnabled and Player.Character and returncoincontaier() and not LocalPlayerDead and not FullBag then
+			if FindNearestCoin(returncoincontaier())[1] ~= nil then
+				local dds = FindNearestCoin(returncoincontaier())
+				if dds[2] > 290 then PcallTP(dds[1].CFrame); continue end
+				local strg = TweenService:Create(Player.Character.HumanoidRootPart, TweenInfo.new(dds[2] / 25, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dds[1].Position) * CFrame.new(0, -5, 0)})
+				strg:Play()
+				local aww
+				aww = strg.Completed:Connect(function()
+					firetouchinterest(Player.Character.HumanoidRootPart, dds[1], 0)
+					wait(0.01)
+					firetouchinterest(Player.Character.HumanoidRootPart, dds[1], 1)
+					aww:Disconnect()
+				end)
+				while dds[1]:FindFirstChild("TouchInterest") do
+					wait()
+				end
+				strg:Cancel()
+				wait(0.0001)
+			end
+		else
+			wait(0.1)
+		end
+		wait(0.0001)
+	end
+end)
+
+ButtonEvent.Event:Connect(function(FunctionName, button)
+	if FunctionName == "Reset when full bag" then
+		ResetOnFullBag(button)
+	elseif FunctionName == "Anti lag" then
+		AntiLagFun(button)
+	elseif FunctionName == "Autofarm" then
+		AutoFarmButton(button)
+	end
+end)
