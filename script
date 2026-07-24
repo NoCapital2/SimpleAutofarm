@@ -307,10 +307,12 @@ function PosPlayerCharacter()
 	end
 end
 
+psobgrgr = nil
 --Autofarm main
 spawn(function()
 	while true do
 		if AutofarmEnabled and Player.Character and returncoincontaier() and not LocalPlayerDead and not FullBag then
+			if psobgrgr == nil then psobgrgr = RunService.Heartbeat:Connect(PosPlayerCharacter) end
 			if FindNearestCoin(returncoincontaier())[1] ~= nil then
 				local dds = FindNearestCoin(returncoincontaier())
 				if dds[2] > 290 then PcallTP(dds[1].CFrame); continue end
@@ -330,6 +332,12 @@ spawn(function()
 				wait(0.0001)
 			end
 		else
+			if psobgrgr ~= nil then 
+				psobgrgr:Disconnect() 
+				psobgrgr = nil
+				workspace.Gravity = 196.2
+				PcallTP(FindMap()["Spawns"][math.random(1, table.maxn(FindMap()["Spawns"]:GetChildren()))].CFrame * CFrame.new(0, 3, 0))
+			end
 			wait(0.1)
 		end
 		wait(0.0001)
