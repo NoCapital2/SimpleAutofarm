@@ -18,13 +18,12 @@ MainGui = GuiLibrary.ScreenGUI({
 	ResetOnSpawn = false,
 	Parent = CoreGui
 })
-MainScreenSize = MainGui.AbsoluteSize
 MainFrame = GuiLibrary.Frame({
 	Name = RandomNameFunction(),
 	AnchorPoint = Vector2.new(.5, .5),
 	BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392),
 	Position = UDim2.new(.5, 0, .5, 0),
-	Size = UDim2.new(400 / 1918, 0, 350 / 822, 0),
+	Size = UDim2.new(400 / MainGui.AbsoluteSize.X, 0, 350 / MainGui.AbsoluteSize.Y, 0),
 	ZIndex = 2,
 	Parent = MainGui,
 	Draggable_ = true
@@ -39,7 +38,7 @@ MainFrameShadow = GuiLibrary.Frame({
 	AnchorPoint = Vector2.new(.5, .5),
 	BackgroundColor3 = Color3.new(0, 0, 0),
 	Position = UDim2.new(.5, 0, .5, 0),
-	Size = UDim2.new(400 / 1918, 0, 350 / 822, 0),
+	Size = UDim2.new(400 / MainGui.AbsoluteSize.X, 0, 350 / MainGui.AbsoluteSize.Y, 0),
 	ZIndex = 1,
 	Parent = MainGui,
 	attach = {MainFrame, UDim2.new(0.005, 0, 0.01, 0)}
@@ -82,10 +81,9 @@ Container = GuiLibrary.Frame({
 	BackgroundTransparency = 1,
 	BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392),
 	Position = UDim2.new(0, 0, 0.143, 0),
-	Size = UDim2.new(400 / MainFrame.AbsoluteSize.X, 0, 300 / MainFrame.AbsoluteSize.Y, 0),
+	Size = UDim2.new(1, 0, 300 / 350, 0),
 	ZIndex = 2,
 	Parent = MainFrame,
-	Draggable_ = true
 })
 
 FunctionList = {"Autofarm", "Anti lag", "Reset when full bag"}
@@ -99,7 +97,6 @@ for i, funcname in FunctionList do
 		BorderColor3 = Color3.new(1, 1, 1),
 		ZIndex = 2,
 		Parent = Container,
-		Draggable_ = true
 	})
 	local FuncLabel = GuiLibrary.TextLabel({
 		Name = RandomNameFunction(),
