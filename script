@@ -158,7 +158,7 @@ function AntiAFK()
 	end
 end
 
---AntiAFK()
+AntiAFK()
 
 resonfulbag = false
 function ResetOnFullBag(btn)
@@ -218,6 +218,12 @@ function AutoFarmButton(btn)
 		AutofarmEnabled = true
 		btn.TextColor3 = Color3.new(0, 1, 0)
 		btn.Text = "Disable"
+		for name, plrdata in PlayerData:InvokeServer() do
+			if name == Player.Name then
+				LocalPlayerDead = plrdata["Dead"]
+				RoundStarted = plrdata["Dead"]
+			end
+		end
 	else
 		AutofarmEnabled = false
 		btn.TextColor3 = Color3.new(1, 0, 0)
