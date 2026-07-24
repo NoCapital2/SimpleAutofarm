@@ -341,6 +341,10 @@ spawn(function()
 	end
 end)
 
+CloseMainFrameButton.MouseButton1Click:Connect(function()
+	MainGui.Enabled = false
+end)
+
 ButtonEvent.Event:Connect(function(FunctionName, button)
 	if FunctionName == "Reset when full bag" then
 		ResetOnFullBag(button)
