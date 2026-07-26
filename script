@@ -218,7 +218,7 @@ function AutoFarmButton(btn)
 		for name, plrdata in PlayerData:InvokeServer() do
 			if name == Player.Name then
 				LocalPlayerDead = plrdata["Dead"]
-				RoundStarted = plrdata["Dead"]
+				RoundStarted = not plrdata["Dead"]
 				print(plrdata["Dead"])
 			end
 		end
