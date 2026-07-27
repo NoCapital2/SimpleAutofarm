@@ -84,6 +84,26 @@ function Library.Frame(...)
 	return obj
 end
 
+function Library.ScrollingFrame(...)
+	local obj = Instance.new("ScrollingFrame")
+	local args = {...}
+	for i,v in pairs(args[1]) do
+		if not table.find(protectionindexes, i) then
+			obj[i] = v
+		end
+	end
+	if args[1]["Draggable_"] ~= nil then
+		SetDraggable(obj)
+	end
+	if args[1]["attach"] ~= nil then
+		args[1]["attach"][1].Changed:Connect(function()
+			obj.AnchorPoint = args[1]["attach"][1].AnchorPoint
+			obj.Position = args[1]["attach"][1].Position + args[1]["attach"][2]
+		end)
+	end
+	return obj
+end
+
 function Library.TextButton(...)
 	local obj = Instance.new("TextButton")
 	local args = {...}
