@@ -76,23 +76,27 @@ NameTextLabel = GuiLibrary.TextLabel({
 	TextScaled = true,
 	Parent = MainFrame
 })
-Container = GuiLibrary.Frame({
+Container = GuiLibrary.ScrollingFrame({
 	Name = RandomNameFunction(),
 	BackgroundTransparency = 1,
-	BackgroundColor3 = Color3.new(0.0980392, 0.0980392, 0.0980392),
+	AutomaticCanvasSize = Enum.AutomaticSize.Y,
+	BottomImage = "",
+	MidImage = "",
+	TopImage = "",
+	BorderSizePixel = 0,
 	Position = UDim2.new(0, 0, 0.143, 0),
-	Size = UDim2.new(1, 0, 300 / 350, 0),
+	Size = UDim2.new(1.04, 0, 300 / 350, 0),
 	ZIndex = 2,
 	Parent = MainFrame,
 })
 
-FunctionList = {"Autofarm", "Anti lag", "Reset when full bag"}
+FunctionList = {"Autofarm", "Anti lag", "Reset when full bag", "Auto kill all(murder)", "Auto kill murder(sherif)"}
 for i, funcname in FunctionList do
 	local FrameC = GuiLibrary.Frame({
 		Name = RandomNameFunction(),
 		BackgroundColor3 = Color3.new(0.509804, 0.509804, 0.509804),
 		Position = UDim2.new(0, 0, 70 * (i-1) / 300, 0),
-		Size = UDim2.new(1, 0, 70 / 300, 0),
+		Size = UDim2.new(0.96, 0, 70 / 300, 0),
 		BorderMode = Enum.BorderMode.Inset,
 		BorderColor3 = Color3.new(1, 1, 1),
 		ZIndex = 2,
@@ -170,6 +174,32 @@ function ResetOnFullBag(btn)
 	end
 end
 
+autokillwhenmurder = false
+function AutoKillWhenMurder(btn)
+	if not autokillwhenmurder then
+		autokillwhenmurder = true
+		btn.TextColor3 = Color3.new(0, 1, 0)
+		btn.Text = "Disable"
+	else
+		autokillwhenmurder = false
+		btn.TextColor3 = Color3.new(1, 0, 0)
+		btn.Text = "Enable"
+	end
+end
+
+autokillwhensherif = false
+function AutoKillWhenSherif(btn)
+	if not autokillwhensherif then
+		autokillwhensherif = true
+		btn.TextColor3 = Color3.new(0, 1, 0)
+		btn.Text = "Disable"
+	else
+		autokillwhensherif = false
+		btn.TextColor3 = Color3.new(1, 0, 0)
+		btn.Text = "Enable"
+	end
+end
+
 antilagerg = false
 function AntiLagFun(btn)
 	if not antilagerg then
@@ -220,10 +250,10 @@ function AutoFarmButton(btn)
 		btn.TextColor3 = Color3.new(0, 1, 0)
 		btn.Text = "Disable"
 		for name, plrdata in PlayerData:InvokeServer() do
+			RolesPlrName[plrdata["Role"]] = name
 			if name == Player.Name then
 				LocalPlayerDead = plrdata["Dead"]
 				RoundStarted = not plrdata["Dead"]
-				print(plrdata["Dead"])
 			end
 		end
 	else
@@ -264,12 +294,62 @@ function FindNearestCoin(container)
 	return gg
 end
 
+function KillAllWhenMurdererFunc()
+	local knife = Player.Backpack:FindFirstChild("Knife")
+	for _, v in pairs(Player.Character:GetChildren()) do
+		if v:IsA("Tool") and v.Name == "Knife" then
+			knife = v
+			break
+		end
+	end
+	if knife then
+		knife.Parent = Player.Character
+		wait(0.2)
+		for _, plr in pairs(Players:GetChildren()) do
+			if plr.Character then
+				if plr.Character:FindFirstChild("Head") then
+					knife.Events.KnifeStabbed:FireServer()
+					knife.Events.HandleTouched:FireServer(plr.Character.Head)
+				end
+			end
+		end
+	end
+	wait(1)
+end
+
+function KillMurderWhenSherif()
+	local gun = Player.Backpack:FindFirstChild("Gun")
+	for _, v in pairs(Player.Character:GetChildren()) do
+		if v:IsA("Tool") and v.Name == "Gun" then
+			gun = v
+			break
+		end
+	end
+	if gun then
+		local HumT = Player.Character:FindFirstChildOfClass("Humanoid")
+		while HumT.Parent ~= nil do
+			gun.Shoot:FireServer(RolesPlrName["Murderer"].Character.HumanoidRootPart.CFrame * CFrame.new(0.01, 0.01, -4.5), RolesPlrName["Murderer"].Character.Head.CFrame)
+			wait(5)
+		end
+	end
+	wait(1)
+end
+
 FullBag = false
 CoinCollectedEvent.OnClientEvent:Connect(function(cointype, current, max)
 	if cointype == "Coin" and tonumber(current) == tonumber(max) then
 		FullBag = true
+		local CurrentHumanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+		if autokillwhenmurder then
+			if RolesPlrName["Murderer"] == Player.Name then
+				KillAllWhenMurdererFunc()
+			end
+		end
+		if autokillwhensherif then
+			KillMurderWhenSherif()
+		end
 		if resonfulbag then
-			Player.Character:FindFirstChildOfClass("Humanoid").Health = 0
+			CurrentHumanoid.Health = 0
 		end
 	end
 end)
@@ -284,8 +364,16 @@ RoundEndEvent.OnClientEvent:Connect(function()
 	FullBag = false
 end)
 
+RolesPlrName = {
+	["Sheriff"] = Color3.new(0, 0, 1),
+	["Murderer"] = Color3.new(1, 0, 0),
+	["Innocent"] = Color3.new(0, 1, 0),
+	["Hero"] = Color3.new(1, 1, 0)
+}
+
 PlayerDataChanged.OnClientEvent:Connect(function(data)
 	for name, plrdata in data do
+		RolesPlrName[plrdata["Role"]] = name
 		if name == Player.Name then
 			LocalPlayerDead = plrdata["Dead"]
 		end
@@ -358,6 +446,10 @@ ButtonEvent.Event:Connect(function(FunctionName, button)
 		ResetOnFullBag(button)
 	elseif FunctionName == "Anti lag" then
 		AntiLagFun(button)
+	elseif FunctionName == "Auto kill all(murder)" then
+		AutoKillWhenMurder(button)
+	elseif FunctionName == "Auto kill murder(sherif)" then
+		AutoKillWhenSherif(button)
 	elseif FunctionName == "Autofarm" then
 		AutoFarmButton(button)
 	end
