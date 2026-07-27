@@ -181,7 +181,9 @@ function AntiLagFun(btn)
 		Player.PlayerGui.MainGUI.ResetOnSpawn = false
 		for _, v1 in pairs(Player.PlayerScripts:GetChildren()) do
 			if v1.Name ~= "TextChatServiceClient" and v1.Name ~= "Pets" and v1.Name ~= "PetsNew" then
-				v1.Enabled = false
+				if v1:IsA("LocalScript") then
+					v1.Enabled = false
+				end
 			end
 		end
 	else
@@ -192,7 +194,9 @@ function AntiLagFun(btn)
 		Player.PlayerGui.MainGUI.ResetOnSpawn = true
 		for _, v1 in pairs(Player.PlayerScripts:GetChildren()) do
 			if v1.Name ~= "TextChatServiceClient" and v1.Name ~= "Pets" and v1.Name ~= "PetsNew" then
-				v1.Enabled = true
+				if v1:IsA("LocalScript") then
+					v1.Enabled = true
+				end
 			end
 		end
 	end
