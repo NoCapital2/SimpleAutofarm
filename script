@@ -328,7 +328,7 @@ function KillMurderWhenSherif()
 	if gun then
 		local HumT = Player.Character:FindFirstChildOfClass("Humanoid")
 		while HumT.Parent ~= nil do
-			gun.Shoot:FireServer(RolesPlrName["Murderer"].Character.HumanoidRootPart.CFrame * CFrame.new(0.01, 0.01, -4.5), RolesPlrName["Murderer"].Character.Head.CFrame)
+			gun.Shoot:FireServer(game.Players[RolesPlrName["Murderer"]].Character.HumanoidRootPart.CFrame * CFrame.new(0.01, 0.01, -4.5), game.Players[RolesPlrName["Murderer"]].Character.Head.CFrame)
 			wait(5)
 		end
 	end
@@ -429,7 +429,7 @@ spawn(function()
 				psobgrgr = nil
 				workspace.Gravity = 196.2
 				Player.Character:FindFirstChildOfClass("Humanoid").PlatformStand = false
-				PcallTP(FindMap()["Spawns"]:GetChildren()[math.random(1, table.maxn(FindMap()["Spawns"]:GetChildren()))].CFrame * CFrame.new(0, 3, 0))
+				pcall(function() PcallTP(FindMap()["Spawns"]:GetChildren()[math.random(1, table.maxn(FindMap()["Spawns"]:GetChildren()))].CFrame * CFrame.new(0, 3, 0)) end)
 			end
 			wait(0.1)
 		end
